@@ -1,0 +1,6 @@
+@Sample.PrimeApi_HostAddress = http://localhost:5018
+
+GET {{Sample.PrimeApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
