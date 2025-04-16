@@ -27,6 +27,7 @@ namespace Sample.PrimeApi
         }
 
         public DbSet<TestUser> Users { get; set; }
+        public DbSet<TestRole> Roles { get; set; }
     }
 
     [Table("Users")]
@@ -38,5 +39,15 @@ namespace Sample.PrimeApi
         public string Name { get; set; }
 
         public string Password { get; set; }
+    }
+
+    [Table("Roles")]
+    public class TestRole
+    {
+        public int Id { get; set; }
+
+        public string RoleName { get; set; }
+
+        public string? Description { get; set; }
     }
 }

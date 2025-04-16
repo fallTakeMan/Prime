@@ -27,6 +27,11 @@ const model = ref([
         icon: "pi pi-fw pi-exclamation-circle",
         to: "/logs/exception",
       },
+      {
+        label: "AuditLogs",
+        icon: "pi pi-fw pi-database",
+        to: "/logs/audit",
+      },
     ],
   },
 ]);

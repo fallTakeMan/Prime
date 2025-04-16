@@ -63,7 +63,12 @@ const getHttpLogs = () => {
     })
     .catch((error) => {
       loading.value = false;
-      console.log(error);
+      toast.add({
+        severity: "error",
+        summary: "loading http logs failed",
+        detail: error.message,
+        life: 6000,
+      });
     });
 };
 const onPageChange = (event) => {
@@ -88,7 +93,7 @@ const confirmDeleteSelected = () => {
     .catch((error) => {
       toast.add({
         severity: "error",
-        summary: "Failed",
+        summary: "delete http logs failed",
         detail: error.message + "\r\n" + (error.response?.data?.message ?? ""),
         life: 6000,
       });

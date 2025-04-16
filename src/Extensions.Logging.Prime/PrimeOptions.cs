@@ -1,4 +1,4 @@
-﻿using Extensions.Logging.Prime.Model;
+﻿using Extensions.Logging.Prime.Database.Configuration;
 
 namespace Extensions.Logging.Prime
 {

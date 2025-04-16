@@ -1,4 +1,4 @@
-﻿using Extensions.Logging.Prime.Model;
+﻿using Extensions.Logging.Prime.Database.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -37,8 +37,8 @@ namespace Extensions.Logging.Prime
                 {
                     var base64bytes = Convert.FromBase64String(base64Encoded.Parameter);
                     var info = Encoding.UTF8.GetString(base64bytes).Split(':', 2);
-                    if (info[0].Equals(PrimeOptionsStatic.UserName, StringComparison.CurrentCultureIgnoreCase) &&
-                        info[1].Equals(PrimeOptionsStatic.Password, StringComparison.CurrentCultureIgnoreCase))
+                    if (info[0].Equals(PrimeOptionsConfig.UserName, StringComparison.CurrentCultureIgnoreCase) &&
+                        info[1].Equals(PrimeOptionsConfig.Password, StringComparison.CurrentCultureIgnoreCase))
                     {
                         var claims = new[] { new Claim(ClaimTypes.Name, info[0]) };
                         var identity = new ClaimsIdentity(claims, PrimeAuthenticationSchemeDefaults.Scheme);

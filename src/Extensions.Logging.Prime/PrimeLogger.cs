@@ -1,6 +1,6 @@
 ﻿using Extensions.Logging.Prime.Database;
+using Extensions.Logging.Prime.Database.Configuration;
 using Extensions.Logging.Prime.Database.Entity;
-using Extensions.Logging.Prime.Model;
 using Extensions.Logging.Prime.Service;
 using Extensions.Logging.Prime.Util;
 using Microsoft.AspNetCore.Http;
@@ -38,8 +38,8 @@ namespace Extensions.Logging.Prime
             }
 
             var ctxService = _serviceProvider.GetRequiredService<IHttpContextService>();
-            var user = ctxService?.GetUser();
-            if (string.IsNullOrWhiteSpace(user.UserId) && user.UserName.Equals(PrimeOptionsStatic.UserName, StringComparison.CurrentCultureIgnoreCase))
+            var user = ctxService?.GetUser()!;
+            if (string.IsNullOrWhiteSpace(user.UserId) && user.UserName.Equals(PrimeOptionsConfig.UserName, StringComparison.CurrentCultureIgnoreCase))
             {
                 return;
             }

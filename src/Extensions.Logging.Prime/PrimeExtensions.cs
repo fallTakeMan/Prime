@@ -1,5 +1,5 @@
 ﻿using Extensions.Logging.Prime.Database;
-using Extensions.Logging.Prime.Model;
+using Extensions.Logging.Prime.Database.Configuration;
 using Extensions.Logging.Prime.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,12 +30,12 @@ namespace Extensions.Logging.Prime
 
             builder.Services.AddDbContext<LogDbContext>(opt => _ = prime.DbProvider switch
             {
-                DatabaseType.MSSQL => opt.UseSqlServer(prime.ConnectionString, x => x.MigrationsAssembly(typeof(Extensions.Logging.Prime.Migrations.SqlServer.IPrimeMigration).Assembly.GetName().Name!)),
-                DatabaseType.MySql => opt.UseMySQL(prime.ConnectionString, x => x.MigrationsAssembly(typeof(Extensions.Logging.Prime.Migrations.MySql.IPrimeMigration).Assembly.GetName().Name!)),
+                DatabaseType.SqlServer => opt.UseSqlServer(prime.ConnectionString, x => x.MigrationsAssembly(typeof(Extensions.Logging.Prime.Migrations.SqlServer.IPrimeMigration).Assembly.GetName().Name!)),
+                DatabaseType.MySql => opt.UseMySql(prime.ConnectionString, ServerVersion.AutoDetect(prime.ConnectionString), x => x.MigrationsAssembly(typeof(Extensions.Logging.Prime.Migrations.MySql.IPrimeMigration).Assembly.GetName().Name!)),
                 DatabaseType.PostgreSQL => opt.UseNpgsql(prime.ConnectionString, x => x.MigrationsAssembly(typeof(Extensions.Logging.Prime.Migrations.PostgreSQL.IPrimeMigration).Assembly.GetName().Name!)),
                 _ => throw new NotSupportedException(nameof(prime.DbProvider))
             });
-
+            
             builder.Services.AddHttpContextAccessor();
             builder.Services.TryAddTransient<IHttpContextService, HttpContextService>();
             builder.Services.TryAddTransient<ILogService, LogService>();
@@ -51,10 +51,12 @@ namespace Extensions.Logging.Prime
             var provider = builder.Services.BuildServiceProvider();
             builder.AddProvider(new PrimeLoggerProvider(provider));
 
-            PrimeOptionsStatic.RouteMatch = prime.RouteMatch;
-            PrimeOptionsStatic.HttpLogIgnoreRouteMatch = prime.HttpLogIgnoreRouteMatch;
-            PrimeOptionsStatic.UserName = prime.PrimeUserName;
-            PrimeOptionsStatic.Password = prime.PrimePassword;
+            PrimeOptionsConfig.RouteMatch = prime.RouteMatch;
+            PrimeOptionsConfig.HttpLogIgnoreRouteMatch = prime.HttpLogIgnoreRouteMatch;
+            PrimeOptionsConfig.UserName = prime.PrimeUserName;
+            PrimeOptionsConfig.Password = prime.PrimePassword;
+            PrimeOptionsConfig.ConnectionString = prime.ConnectionString;
+            PrimeOptionsConfig.DbProvider = prime.DbProvider;
 
             return builder;
         }
@@ -107,5 +109,16 @@ namespace Extensions.Logging.Prime
             new HostedEndpointRouteProvider(endpoint, opt).MapApiRoute();
         }
 
+        public static DbContextOptionsBuilder AddPrimeAuditingInterceptor(this DbContextOptionsBuilder builder, IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var prime = serviceProvider.GetService<PrimeOptions>();
+            if(prime is null)
+            {
+                throw new ArgumentNullException(nameof(PrimeOptions));
+            }
+            builder.AddInterceptors(new PrimeAuditingInterceptor(serviceProvider));
+            return builder;
+        }
     }
 }

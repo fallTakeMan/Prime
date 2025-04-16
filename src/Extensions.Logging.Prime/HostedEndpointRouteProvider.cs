@@ -1,4 +1,5 @@
-﻿using Extensions.Logging.Prime.Model;
+﻿using Extensions.Logging.Prime.Database.Configuration;
+using Extensions.Logging.Prime.Model;
 using Extensions.Logging.Prime.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +33,8 @@ namespace Extensions.Logging.Prime
             _endpoint.MapDelete(_options.RouteMatch + "/api/logs/http", DeleteHttpLogsAsync).RequireAuthorization(PrimeAuthorizationPolicyDefaults.Policy);
             _endpoint.MapGet(_options.RouteMatch + "/api/logs/exception", GetExceptionLogsAsync).RequireAuthorization(PrimeAuthorizationPolicyDefaults.Policy);
             _endpoint.MapDelete(_options.RouteMatch + "/api/logs/exception", DeleteExceptionLogsAsync).RequireAuthorization(PrimeAuthorizationPolicyDefaults.Policy);
+            _endpoint.MapGet(_options.RouteMatch + "/api/logs/audit", GetAuditLogsAsync).RequireAuthorization(PrimeAuthorizationPolicyDefaults.Policy);
+            _endpoint.MapDelete(_options.RouteMatch + "/api/logs/audit", DeleteAuditLogsAsync).RequireAuthorization(PrimeAuthorizationPolicyDefaults.Policy);
         }
 
         private async Task SignIn(HttpContext context)
@@ -42,9 +45,9 @@ namespace Extensions.Logging.Prime
                 var bodyReadTask = await context.Request.BodyReader.ReadAsync();
                 var reqStr = Encoding.UTF8.GetString(bodyReadTask.Buffer);
                 context.Request.Body.Position = 0;
-                var req = System.Text.Json.JsonSerializer.Deserialize<PrimeSignIn>(reqStr);
-                if (req.UserName.Equals(PrimeOptionsStatic.UserName, StringComparison.CurrentCultureIgnoreCase) &&
-                    req.Password.Equals(PrimeOptionsStatic.Password, StringComparison.CurrentCultureIgnoreCase))
+                var req = System.Text.Json.JsonSerializer.Deserialize<PrimeSignIn>(reqStr)!;
+                if (req.UserName.Equals(PrimeOptionsConfig.UserName, StringComparison.CurrentCultureIgnoreCase) &&
+                    req.Password.Equals(PrimeOptionsConfig.Password, StringComparison.CurrentCultureIgnoreCase))
                 {
                     var basic = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{req.UserName}:{req.Password}"));
                     
@@ -93,7 +96,7 @@ namespace Extensions.Logging.Prime
                 var bodyReadTask = await context.Request.BodyReader.ReadAsync();
                 var reqStr = Encoding.UTF8.GetString(bodyReadTask.Buffer);
                 context.Request.Body.Position = 0;
-                var req = System.Text.Json.JsonSerializer.Deserialize<IdDeletion>(reqStr);
+                var req = System.Text.Json.JsonSerializer.Deserialize<LongIdDeletion>(reqStr)!;
                 using (var scope = _serviceProvider.CreateAsyncScope())
                 {
                     var service = scope.ServiceProvider.GetRequiredService<ILogService>();
@@ -128,7 +131,7 @@ namespace Extensions.Logging.Prime
                 var bodyReadTask = await context.Request.BodyReader.ReadAsync();
                 var reqStr = Encoding.UTF8.GetString(bodyReadTask.Buffer);
                 context.Request.Body.Position = 0;
-                var req = System.Text.Json.JsonSerializer.Deserialize<IdDeletion>(reqStr);
+                var req = System.Text.Json.JsonSerializer.Deserialize<LongIdDeletion>(reqStr)!;
                 using (var scope = _serviceProvider.CreateAsyncScope())
                 {
                     var service = scope.ServiceProvider.GetRequiredService<ILogService>();
@@ -164,11 +167,46 @@ namespace Extensions.Logging.Prime
                 var bodyReadTask = await context.Request.BodyReader.ReadAsync();
                 var reqStr = Encoding.UTF8.GetString(bodyReadTask.Buffer);
                 context.Request.Body.Position = 0;
-                var req = System.Text.Json.JsonSerializer.Deserialize<IdDeletion>(reqStr);
+                var req = System.Text.Json.JsonSerializer.Deserialize<LongIdDeletion>(reqStr)!;
                 using (var scope = _serviceProvider.CreateAsyncScope())
                 {
                     var service = scope.ServiceProvider.GetRequiredService<ILogService>();
                     var result = await service.DeleteExceptionLogsAsync(req.Ids);
+                    await context.Response.WriteAsJsonAsync(PrimeApiResult.Success());
+                }
+            }
+            catch (Exception e)
+            {
+                context.Response.StatusCode = 500;
+                await context.Response.WriteAsJsonAsync(PrimeApiResult.Error(e.Message));
+            }
+        }
+
+        private async Task GetAuditLogsAsync(HttpContext context)
+        {
+            var param = HttpUtility.ParseQueryString(context.Request.QueryString.ToString());
+            int.TryParse(param.Get("index") ?? "1", out int index);
+            int.TryParse(param.Get("size") ?? "20", out int size);
+            using (var scope = _serviceProvider.CreateAsyncScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<ILogService>();
+                var data = await service.GetAuditLogsAsync(index, size);
+                await context.Response.WriteAsJsonAsync(data);
+            }
+        }
+        private async Task DeleteAuditLogsAsync(HttpContext context)
+        {
+            try
+            {
+                context.Request.EnableBuffering();
+                var bodyReadTask = await context.Request.BodyReader.ReadAsync();
+                var reqStr = Encoding.UTF8.GetString(bodyReadTask.Buffer);
+                context.Request.Body.Position = 0;
+                var req = System.Text.Json.JsonSerializer.Deserialize<IntIdDeletion>(reqStr)!;
+                using (var scope = _serviceProvider.CreateAsyncScope())
+                {
+                    var service = scope.ServiceProvider.GetRequiredService<ILogService>();
+                    var result = await service.DeleteAuditLogsAsync(req.Ids);
                     await context.Response.WriteAsJsonAsync(PrimeApiResult.Success());
                 }
             }

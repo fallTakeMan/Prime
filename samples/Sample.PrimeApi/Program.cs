@@ -9,13 +9,13 @@ builder.Logging.AddPrime(cfg =>
 {
     cfg.HttpLogIgnoreRouteMatch = "/swagger";
 
-    //cfg.DbProvider = Extensions.Logging.Prime.Model.DatabaseType.MSSQL;
+    //cfg.DbProvider = Extensions.Logging.Prime.Database.Configuration.DatabaseType.SqlServer;
     //cfg.ConnectionString = builder.Configuration.GetConnectionString("MSSQL") ?? "";
 
-    //cfg.DbProvider = Extensions.Logging.Prime.Model.DatabaseType.MySql;
+    //cfg.DbProvider = Extensions.Logging.Prime.Database.Configuration.DatabaseType.MySql;
     //cfg.ConnectionString = builder.Configuration.GetConnectionString("MySql") ?? "";
 
-    cfg.DbProvider = Extensions.Logging.Prime.Model.DatabaseType.PostgreSQL;
+    cfg.DbProvider = Extensions.Logging.Prime.Database.Configuration.DatabaseType.PostgreSQL;
     cfg.ConnectionString = builder.Configuration.GetConnectionString("Npgsql") ?? "";
 
     //cfg.PrimeUserName = "test";
@@ -67,6 +67,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApiDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("PrimeApi"));
+    options.AddPrimeAuditingInterceptor(builder.Services);
 });
 
 var app = builder.Build();

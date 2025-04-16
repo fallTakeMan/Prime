@@ -1,6 +1,6 @@
 ﻿using Extensions.Logging.Prime.Database;
+using Extensions.Logging.Prime.Database.Configuration;
 using Extensions.Logging.Prime.Database.Entity;
-using Extensions.Logging.Prime.Model;
 using Extensions.Logging.Prime.Service;
 using Extensions.Logging.Prime.Util;
 using Microsoft.AspNetCore.Http;
@@ -101,8 +101,8 @@ namespace Extensions.Logging.Prime
 
             return mime.Any(x => path.EndsWith(x, StringComparison.CurrentCultureIgnoreCase)) ||
                 path.Equals("/") ||
-                path.StartsWith(PrimeOptionsStatic.RouteMatch, StringComparison.CurrentCultureIgnoreCase) ||
-                PrimeOptionsStatic.HttpLogIgnoreRouteMatch.Split(',').Where(x => x.Trim().Length > 0).Any(x => path.StartsWith(x, StringComparison.CurrentCultureIgnoreCase));
+                path.StartsWith(PrimeOptionsConfig.RouteMatch, StringComparison.CurrentCultureIgnoreCase) ||
+                PrimeOptionsConfig.HttpLogIgnoreRouteMatch.Split(',').Where(x => x.Trim().Length > 0).Any(x => path.StartsWith(x, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }

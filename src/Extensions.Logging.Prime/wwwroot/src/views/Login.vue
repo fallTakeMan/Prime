@@ -35,6 +35,7 @@ const signin = () => {
 </script>
 
 <template>
+  <Toast />
   <FloatingConfigurator />
   <div
     class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden"
@@ -93,6 +94,7 @@ const signin = () => {
               class="mb-4"
               fluid
               :feedback="false"
+              @keyup.enter="signin"
             ></Password>
 
             <Button label="Sign In" class="w-full" @click="signin"></Button>

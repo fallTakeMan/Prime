@@ -68,6 +68,32 @@ namespace Extensions.Logging.Prime.Migrations.PostgreSQL.Migrations
                     b.ToTable("AppLogs");
                 });
 
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.EntityAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuditMessage")
+                        .HasColumnType("TEXT")
+                        .HasComment("审核信息");
+
+                    b.Property<int>("SaveChangesAuditId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasComment("EntityState(2=Delete;3=Update;4=Insert)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaveChangesAuditId");
+
+                    b.ToTable("EntityAudit");
+                });
+
             modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.ExceptionLogEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -238,6 +264,58 @@ namespace Extensions.Logging.Prime.Migrations.PostgreSQL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HttpLogs");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC时间");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("TEXT")
+                        .HasComment("错误信息");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC时间");
+
+                    b.Property<bool>("Succeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("VARCHAR(64)")
+                        .HasComment("系统登录用户id");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("VARCHAR(100)")
+                        .HasComment("系统登录用户名");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SaveChangesAudits");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.EntityAudit", b =>
+                {
+                    b.HasOne("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", "SaveChangesAudit")
+                        .WithMany("Entities")
+                        .HasForeignKey("SaveChangesAuditId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SaveChangesAudit");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", b =>
+                {
+                    b.Navigation("Entities");
                 });
 #pragma warning restore 612, 618
         }

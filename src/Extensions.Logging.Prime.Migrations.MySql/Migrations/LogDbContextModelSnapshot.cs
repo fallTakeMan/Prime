@@ -3,6 +3,7 @@ using System;
 using Extensions.Logging.Prime.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -18,6 +19,8 @@ namespace Extensions.Logging.Prime.Migrations.MySql.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.AppLogEntity", b =>
                 {
@@ -63,6 +66,32 @@ namespace Extensions.Logging.Prime.Migrations.MySql.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppLogs");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.EntityAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuditMessage")
+                        .HasColumnType("TEXT")
+                        .HasComment("审核信息");
+
+                    b.Property<int>("SaveChangesAuditId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int")
+                        .HasComment("EntityState(2=Delete;3=Update;4=Insert)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaveChangesAuditId");
+
+                    b.ToTable("EntityAudit");
                 });
 
             modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.ExceptionLogEntity", b =>
@@ -235,6 +264,58 @@ namespace Extensions.Logging.Prime.Migrations.MySql.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HttpLogs");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime(6)")
+                        .HasComment("UTC时间");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("TEXT")
+                        .HasComment("错误信息");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime(6)")
+                        .HasComment("UTC时间");
+
+                    b.Property<bool>("Succeeded")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("VARCHAR(64)")
+                        .HasComment("系统登录用户id");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("VARCHAR(100)")
+                        .HasComment("系统登录用户名");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SaveChangesAudits");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.EntityAudit", b =>
+                {
+                    b.HasOne("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", "SaveChangesAudit")
+                        .WithMany("Entities")
+                        .HasForeignKey("SaveChangesAuditId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SaveChangesAudit");
+                });
+
+            modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.SaveChangesAudit", b =>
+                {
+                    b.Navigation("Entities");
                 });
 #pragma warning restore 612, 618
         }

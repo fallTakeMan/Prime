@@ -4,23 +4,26 @@ using Extensions.Logging.Prime.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
+namespace Extensions.Logging.Prime.Migrations.MySql.Migrations
 {
     [DbContext(typeof(LogDbContext))]
-    partial class LogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414102631_AddAuditing")]
+    partial class AddAuditing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.AppLogEntity", b =>
                 {
@@ -42,7 +45,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("日志级别");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime(6)")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Logger")
@@ -74,7 +77,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuditMessage")
                         .HasColumnType("TEXT")
@@ -138,7 +141,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("日志级别");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime(6)")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Logger")
@@ -212,7 +215,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("客户端ip");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime(6)")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Method")
@@ -272,10 +275,10 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime(6)")
                         .HasComment("UTC时间");
 
                     b.Property<string>("ErrorMessage")
@@ -283,11 +286,11 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("错误信息");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime(6)")
                         .HasComment("UTC时间");
 
                     b.Property<bool>("Succeeded")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserId")
                         .HasColumnType("VARCHAR(64)")

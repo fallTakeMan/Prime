@@ -22,6 +22,8 @@ namespace Extensions.Logging.Prime.Service
             int httpLogsToday = await _dbContext.HttpLogs.Where(x => x.LogTime > DateTime.UtcNow.Date).CountAsync();
             int exceptionLogRecords = await _dbContext.ExceptionLogs.CountAsync();
             int exceptionLogsToday = await _dbContext.ExceptionLogs.Where(x => x.LogTime > DateTime.UtcNow.Date).CountAsync();
+            int auditLogRecords = await _dbContext.SaveChangesAudits.CountAsync();
+            int auditLogsToday = await _dbContext.SaveChangesAudits.Where(x => x.StartTime > DateTime.UtcNow.Date).CountAsync();
             var data = new StatsModel
             {
                 AppLogRecords = appLogRecords,
@@ -29,7 +31,9 @@ namespace Extensions.Logging.Prime.Service
                 HttpLogRecords = httpLogRecords,
                 HttpLogsToday = httpLogsToday,
                 ExceptionLogRecords = exceptionLogRecords,
-                ExceptionLogsToday = exceptionLogsToday
+                ExceptionLogsToday = exceptionLogsToday,
+                AuditLogRecords = auditLogRecords,
+                AuditLogsToday = auditLogsToday
             };
             return PrimeApiResult<StatsModel>.Success(data);
         }
@@ -126,5 +130,38 @@ namespace Extensions.Logging.Prime.Service
         {
             return await _dbContext.ExceptionLogs.Where(x => ids.Contains(x.Id)).ExecuteDeleteAsync();
         }
+
+        #region Audit logs
+        public PagedResult<SaveChangesAudit> GetAuditLogs(int index, int size)
+        {
+            var query = from log in _dbContext.SaveChangesAudits.Include(x => x.Entities)
+                        orderby log.StartTime descending
+                        select log;
+            var total = query.Count();
+            var list = query.Skip((index - 1) * size).Take(size).AsNoTracking().ToList();
+            return new PagedResult<SaveChangesAudit>(list, index, size, total);
+        }
+
+        public async Task<PagedResult<SaveChangesAudit>> GetAuditLogsAsync(int index, int size)
+        {
+            var query = from log in _dbContext.SaveChangesAudits.Include(x => x.Entities)
+                        orderby log.StartTime descending
+                        select log;
+            var total = await query.CountAsync();
+            var list = await query.Skip((index - 1) * size).Take(size).AsNoTracking().ToListAsync();
+            return new PagedResult<SaveChangesAudit>(list, index, size, total);
+        }
+
+        public Task<int> DeleteAuditLogs(int[] ids)
+        {
+            var result = _dbContext.SaveChangesAudits.Include(x => x.Entities).Where(x => ids.Contains(x.Id)).ExecuteDelete();
+            return Task.FromResult(result);
+        }
+
+        public async Task<int> DeleteAuditLogsAsync(int[] ids)
+        {
+            return await _dbContext.SaveChangesAudits.Include(x => x.Entities).Where(x => ids.Contains(x.Id)).ExecuteDeleteAsync();
+        } 
+        #endregion
     }
 }

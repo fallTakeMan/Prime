@@ -48,4 +48,20 @@ export const LogService = {
       data: { Ids: ids },
     });
   },
+
+  getAuditLogs(index = 1, size = 20) {
+    return request({
+      url: "logs/audit",
+      method: "get",
+      params: { index, size },
+    });
+  },
+
+  deleteAuditLogs(ids) {
+    return request({
+      url: "logs/audit",
+      method: "delete",
+      data: { Ids: ids },
+    });
+  },
 };

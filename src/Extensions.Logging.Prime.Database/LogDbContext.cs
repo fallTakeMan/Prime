@@ -7,7 +7,7 @@ namespace Extensions.Logging.Prime.Database
     {
         public LogDbContext(DbContextOptions<LogDbContext> options) : base(options)
         {
-            if (Database.HasPendingModelChanges() || Database.GetPendingMigrations().Any())
+            if (Database.GetPendingMigrations().Any())
             {
                 Database.Migrate();
             }
@@ -18,5 +18,7 @@ namespace Extensions.Logging.Prime.Database
         public DbSet<HttpLogEntity> HttpLogs { get; set; }
 
         public DbSet<ExceptionLogEntity> ExceptionLogs { get; set; }
+
+        public DbSet<SaveChangesAudit> SaveChangesAudits { get; set; }
     }
 }

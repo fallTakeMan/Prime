@@ -30,5 +30,13 @@ namespace Extensions.Logging.Prime.Service
         Task<int> DeleteExceptionLogs(long[] ids);
 
         Task<int> DeleteExceptionLogsAsync(long[] ids);
+
+        PagedResult<SaveChangesAudit> GetAuditLogs(int index, int size);
+
+        Task<PagedResult<SaveChangesAudit>> GetAuditLogsAsync(int index, int size);
+
+        Task<int> DeleteAuditLogs(int[] ids);
+
+        Task<int> DeleteAuditLogsAsync(int[] ids);
     }
 }

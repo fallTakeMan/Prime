@@ -13,5 +13,9 @@ namespace Extensions.Logging.Prime.Model
         public int ExceptionLogRecords { get; set; }
 
         public int ExceptionLogsToday { get; set; }
+
+        public int AuditLogRecords { get; set; }
+
+        public int AuditLogsToday { get; set; }
     }
 }

@@ -3,24 +3,27 @@ using System;
 using Extensions.Logging.Prime.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
+namespace Extensions.Logging.Prime.Migrations.PostgreSQL.Migrations
 {
     [DbContext(typeof(LogDbContext))]
-    partial class LogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414093655_AddAuditing")]
+    partial class AddAuditing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Extensions.Logging.Prime.Database.Entity.AppLogEntity", b =>
                 {
@@ -29,7 +32,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("主键，雪花id");
 
                     b.Property<int>("EventId")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("Event Id");
 
                     b.Property<string>("EventName")
@@ -42,7 +45,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("日志级别");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Logger")
@@ -72,19 +75,19 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuditMessage")
                         .HasColumnType("TEXT")
                         .HasComment("审核信息");
 
                     b.Property<int>("SaveChangesAuditId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("State")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("EntityState(2=Delete;3=Update;4=Insert)");
 
                     b.HasKey("Id");
@@ -105,7 +108,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("请求连接id");
 
                     b.Property<int>("EventId")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("Event Id");
 
                     b.Property<string>("EventName")
@@ -138,7 +141,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("日志级别");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Logger")
@@ -212,7 +215,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("客户端ip");
 
                     b.Property<DateTime>("LogTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("UTC时间");
 
                     b.Property<string>("Method")
@@ -246,7 +249,7 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("响应头");
 
                     b.Property<int>("StatusCode")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("响应状态码");
 
                     b.Property<string>("TraceId")
@@ -270,12 +273,12 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("UTC时间");
 
                     b.Property<string>("ErrorMessage")
@@ -283,11 +286,11 @@ namespace Extensions.Logging.Prime.Migrations.SqlServer.Migrations
                         .HasComment("错误信息");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("timestamp with time zone")
                         .HasComment("UTC时间");
 
                     b.Property<bool>("Succeeded")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("UserId")
                         .HasColumnType("VARCHAR(64)")

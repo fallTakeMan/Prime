@@ -8,6 +8,8 @@ const httpLogRecords = ref(0);
 const httpLogsToday = ref(0);
 const exceptionLogRecords = ref(0);
 const exceptionLogsToday = ref(0);
+const auditLogRecords = ref(0);
+const auditLogsToday = ref(0);
 
 const getStats = () => {
   DashboardService.getStats()
@@ -18,6 +20,8 @@ const getStats = () => {
       httpLogsToday.value = resp.data.httpLogsToday;
       exceptionLogRecords.value = resp.data.exceptionLogRecords;
       exceptionLogsToday.value = resp.data.exceptionLogsToday;
+      auditLogRecords.value = resp.data.auditLogRecords;
+      auditLogsToday.value = resp.data.auditLogsToday;
     })
     .catch((error) => {
       console.log(error);
@@ -28,7 +32,7 @@ onBeforeMount(() => {
 });
 </script>
 <template>
-  <div class="col-span-12 lg:col-span-6 xl:col-span-4">
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
     <div class="card mb-0">
       <div class="flex justify-between mb-4">
         <div>
@@ -51,7 +55,7 @@ onBeforeMount(() => {
     </div>
   </div>
 
-  <div class="col-span-12 lg:col-span-6 xl:col-span-4">
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
     <div class="card mb-0">
       <div class="flex justify-between mb-4">
         <div>
@@ -72,7 +76,7 @@ onBeforeMount(() => {
     </div>
   </div>
 
-  <div class="col-span-12 lg:col-span-6 xl:col-span-4">
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
     <div class="card mb-0">
       <div class="flex justify-between mb-4">
         <div>
@@ -93,6 +97,29 @@ onBeforeMount(() => {
       <span class="text-primary font-medium"
         >{{ exceptionLogsToday }} new
       </span>
+      <span class="text-muted-color">since today</span>
+    </div>
+  </div>
+
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <div class="card mb-0">
+      <div class="flex justify-between mb-4">
+        <div>
+          <span class="block text-muted-color font-medium mb-4"
+            >Audit Logs</span
+          >
+          <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">
+            {{ auditLogRecords }}
+          </div>
+        </div>
+        <div
+          class="flex items-center justify-center bg-neutral-100 dark:bg-neutral-400/10 rounded-border"
+          style="width: 2.5rem; height: 2.5rem"
+        >
+          <i class="pi pi-database text-neutral-500 !text-xl"></i>
+        </div>
+      </div>
+      <span class="text-primary font-medium">{{ auditLogsToday }} new </span>
       <span class="text-muted-color">since today</span>
     </div>
   </div>

@@ -27,6 +27,11 @@ const router = createRouter({
           name: "exception-logs",
           component: () => import("@/views/ExceptionLogs.vue"),
         },
+        {
+          path: "logs/audit",
+          name: "audit-logs",
+          component: () => import("@/views/AuditLogs.vue"),
+        },
       ],
     },
     {
